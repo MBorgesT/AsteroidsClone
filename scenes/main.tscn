@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://scenes/ship.tscn" type="PackedScene" id=1]
+[ext_resource path="res://scripts/asteroid_spawner.gd" type="Script" id=2]
+[ext_resource path="res://fonts/dogicapixel.ttf" type="DynamicFontData" id=3]
+
+[sub_resource type="DynamicFont" id=1]
+size = 24
+font_data = ExtResource( 3 )
+
+[sub_resource type="GDScript" id=2]
+script/source = "extends Label
+
+func _ready():
+	game.connect('score_changed', self, '_on_score_changed')
+	pass
+
+func _on_score_changed():
+	set_text('SCORE ' + str(game.score))
+"
+
+[node name="main" type="Node"]
+
+[node name="ship" parent="." instance=ExtResource( 1 )]
+position = Vector2( 450, 360 )
+
+[node name="asteroid_spawner" type="Node" parent="."]
+script = ExtResource( 2 )
+
+[node name="spawn_timer" type="Timer" parent="asteroid_spawner"]
+wait_time = 0.1
+autostart = true
+
+[node name="difficulty_increaser" type="Timer" parent="asteroid_spawner"]
+wait_time = 15.0
+autostart = true
+
+[node name="hud" type="CanvasLayer" parent="."]
+layer = 3
+
+[node name="score" type="Label" parent="hud"]
+margin_left = 15.0
+margin_top = 14.0
+margin_right = 887.0
+margin_bottom = 61.0
+custom_fonts/font = SubResource( 1 )
+text = "SCORE 0"
+script = SubResource( 2 )
+__meta__ = {
+"_edit_use_anchors_": false
+}
+[connection signal="timeout" from="asteroid_spawner/spawn_timer" to="asteroid_spawner" method="_on_spawn_timer_timeout"]
+[connection signal="timeout" from="asteroid_spawner/difficulty_increaser" to="asteroid_spawner" method="_on_difficulty_increaser_timeout"]
